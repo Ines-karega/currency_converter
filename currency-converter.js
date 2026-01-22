@@ -1,103 +1,69 @@
-import input from "sync-input";
+const input = require("sync-input");
 
-let hasUsedConverter = false;
+const rates = {
+    USD: 1.0,
+    JPY: 113.5,
+    EUR: 0.89,
+    RUB: 74.36,
+    GBP: 0.75,
+    RWF: 9.86,
+    NRA: 1200,
+    SHL: 2900
+};
 
-function startConversion() {
+function convertCurrency() {
 
-    const rates = {
-        USD: 1,
-        JPY: 150,
-        EUR: 0.9,
-        RUB: 90,
-        GBP: 0.85,
-        RWF: 1320.0
-        };
+    console.log("\nAvailable currencies (1 USD =):");
 
-    function calculate(amount, from, to) {
-        let valueInUSD = amount / rates[from];
-        let finalValue = valueInUSD * rates[to];
-        return finalValue.toFixed(2);
+    for (let currency in rates) {
+        console.log(`${currency} : ${rates[currency]}`);
     }
 
-    console.log("\nAvailable currencies (based on 1 USD):");
-    for (let code in rates) {
-        console.log(`${code}: ${rates[code]}`);
+    let from = input("\nConvert FROM: ").toUpperCase();
+    let to = input("Convert TO: ").toUpperCase();
+
+    if (!(from in rates) || !(to in rates)) {
+        console.log("Invalid currency.");
+        return;
     }
 
-    let sourceCurrency;
-    let targetCurrency;
-
-    // validate source currency
-    while (true) {
-        sourceCurrency = input("\nConvert from: ").toUpperCase();
-
-        if (rates[sourceCurrency]) {
-            break;
-        }
-        console.log("Unknown currency. Please try again.");
+    if (from === to) {
+        console.log("You cannot convert the same currency.");
+        return;
     }
 
-    // validate target currency
-    while (true) {
-        targetCurrency = input("Convert to: ").toUpperCase();
+    let amount = Number(input("Enter amount: "));
 
-        if (!rates[targetCurrency]) {
-            console.log("Unknown currency. Please try again.");
-            continue;
-        }
-
-        if (targetCurrency === sourceCurrency) {
-            console.log("Source and target currencies cannot be the same.");
-            continue;
-        }
-
-        break;
+    if (isNaN(amount) || amount <= 0) {
+        console.log("Invalid amount.");
+        return;
     }
 
-    let amount;
-
-    // validate amount
-    while (true) {
-        amount = Number(input("Amount to convert: "));
-
-        if (amount > 0) {
-            break;
-        }
-        console.log("Amount must be a number greater than 0.");
-    }
-
-    let converted = calculate(amount, sourceCurrency, targetCurrency);
+    let result = (amount / rates[from]) * rates[to];
 
     console.log(
-        `\n${amount} ${sourceCurrency} equals ${converted} ${targetCurrency}`
+        `\n${amount} ${from} = ${result.toFixed(2)} ${to}`
     );
-
-    hasUsedConverter = true;
-}
-
-function exitProgram() {
-    console.log("\nThank you for using the currency converter.");
-    console.log("Goodbye!");
 }
 
 console.log("WELCOME TO THE CURRENCY CONVERTER");
 
 while (true) {
 
-    console.log(`\nWhat would you like to do${hasUsedConverter ? " now" : ""}?`);
-    console.log(`1. Convert currency${hasUsedConverter ? " again" : ""}`);
+    console.log("\n1. Convert currency");
     console.log("2. Exit");
 
-    let option = input("Your choice: ");
+    let choice = input("Choose 1 or 2: ");
 
-    if (option === "1") {
-        startConversion();
+    if (choice === "1") {
+        convertCurrency();
     } 
-    else if (option === "2") {
-        exitProgram();
+    else if (choice === "2") {
+        console.log("\nThank you for using the currency converter.");
+        console.log("Goodbye!");
         break;
     } 
     else {
-        console.log("Invalid option. Please select 1 or 2.");
+        console.log("Invalid choice.");
     }
 }
